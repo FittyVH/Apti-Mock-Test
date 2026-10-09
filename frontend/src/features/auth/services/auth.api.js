@@ -5,11 +5,22 @@ const api = axios.create({
     withCredentials: true
 });
 
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 export async function register({ username, email, password }) {
     try {
         const response = await api.post('/api/auth/register', {
             username, email, password
         });
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token);
+        }
         return response.data;
     } catch (err) {
         const msg = err.response?.data?.message || err.message || 'Registration failed';
@@ -22,6 +33,9 @@ export async function login({ email, password }) {
         const response = await api.post("/api/auth/login", {
             email, password
         });
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token);
+        }
         return response.data;
     } catch (err) {
         const msg = err.response?.data?.message || err.message || 'Invalid email or password';
@@ -32,8 +46,10 @@ export async function login({ email, password }) {
 export async function logout() {
     try {
         const response = await api.get("/api/auth/logout");
+        localStorage.removeItem("token");
         return response.data;
     } catch (err) {
+        localStorage.removeItem("token");
         const msg = err.response?.data?.message || err.message || 'Logout failed';
         throw new Error(msg);
     }

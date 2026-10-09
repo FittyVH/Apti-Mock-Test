@@ -49,8 +49,10 @@ export const useAuth = () => {
         try {
             await logout();
             setUser(null);
+            localStorage.removeItem("token");
         } catch (err) {
             console.error(err);
+            localStorage.removeItem("token");
         } finally {
             setLoading(false);
         }
@@ -66,10 +68,14 @@ export const useAuth = () => {
                         setUser(data.user);
                     } else {
                         setUser(null);
+                        localStorage.removeItem("token");
                     }
                 }
             } catch (err) {
-                if (isMounted) setUser(null);
+                if (isMounted) {
+                    setUser(null);
+                    localStorage.removeItem("token");
+                }
             } finally {
                 if (isMounted) setLoading(false);
             }

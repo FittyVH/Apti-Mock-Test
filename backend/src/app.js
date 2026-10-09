@@ -4,6 +4,9 @@ const cors = require('cors')
 
 const app = express()
 
+// Trust first proxy (Render / reverse proxy)
+app.set('trust proxy', 1)
+
 // CORS configuration to allow credentialed requests from Vite dev server and Render
 const allowedOrigins = [
     'http://localhost:5173',
